@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Happy Birthday Sneha</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- GSAP for smooth animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    :root {
+      --pink: #ff6fae;
+      --pink-soft: #ff8fbd;
+      --pink-deep: #ff3b8d;
+      --bg-dark: #05000a;
+      --bg-night: radial-gradient(circle at top, #1a2440 0%, #05000f 60%, #020008 100%);
+      --glow: 0 0 16px rgba(255, 111, 174, 0.9);
+      --glow-soft: 0 0 25px rgba(255, 143, 189, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #fff4fb, #ffe8f5, #fdd7f1);
+      color: #2b1023;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      overflow: hidden;
+      background-size: 200% 200%;
+      animation: backgroundDrift 25s ease-in-out infinite;
+    }
+
+    #app {
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page {
+      position: absolute;
+      inset: 0;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .page.active {
+      display: flex;
+    }
+
+    /* Shared layout */
+    .center-card {
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 18px 28px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 18px 40px rgba(255, 111, 174, 0.35);
+      border: 1px solid rgba(255, 143, 189, 0.45);
+      backdrop-filter: blur(14px);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    h1, h2, h3 {
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    /* Glowing buttons */
+    .glow-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 20px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      background: radial-gradient(circle at 10% 0, #ffe5f4, #ff6fae);
+      color: #3a1224;
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow:
+        0 0 0 1px rgba(255, 143, 189, 0.6),
+        0 12px 28px rgba(255, 59, 141, 0.35),
+        0 0 24px rgba(255, 143, 189, 0.8);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.18s ease-out, box-shadow 0.18s ease-out;
+    }
+
+    .glow-button::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.7), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.25s ease-out;
+    }
+
+    .glow-button:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow:
+        0 0 0 1px rgba(255, 143, 189, 0.9),
+        0 16px 40px rgba(255, 59, 141, 0.5),
+        0 0 32px rgba(255, 143, 189, 1);
+    }
+
+    .glow-button:hover::after {
+      opacity: 0.6;
+    }
+
+    .glow-button:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow:
+        0 0 0 1px rgba(255, 143, 189, 0.9),
+        0 8px 16px rgba(255, 59, 141, 0.4);
+    }
+
+    /* PAGE 1 */
+    #page1 {
+      background: transparent;
+    }
+
+    .flip-box-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .flip-card {
+      width: 210px;
+      height: 135px;
+      perspective: 900px;
+    }
+
+    .flip-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: flipCard 4s infinite ease-in-out;
+    }
+
+    .flip-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      backface-visibility: hidden;
+      background: radial-gradient(circle at 0 0, #ffeaf7, #ffbcd9, #ff8fbd);
+      box-shadow:
+        0 10px 24px rgba(255, 111, 174, 0.55),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+      color: #3c1020;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .flip-face.back {
+      transform: rotateY(180deg);
+      background: radial-gradient(circle at 100% 0, #ffe5f4, #ff99c6, #ff65a4);
+    }
+
+    .box-caption {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    /* Kawaii sticker */
+    .kawaii-sticker {
+      margin-top: 22px;
+      width: 96px;
+      height: 96px;
+      border-radius: 26px;
+      background: radial-gradient(circle at 20% 0, #fff7fb, #ffd3e9, #ff9ecd);
+      box-shadow:
+        0 10px 26px rgba(255, 111, 174, 0.6),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kawaii-face {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .kawaii-eyes {
+      display: flex;
+      gap: 22px;
+      margin-bottom: 4px;
+    }
+
+    .kawaii-eye {
+      width: 18px;
+      height: 24px;
+      border-radius: 50%;
+      background: #2b1023;
+      position: relative;
+    }
+
+    .kawaii-eye::after {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      top: 4px;
+      left: 4px;
+    }
+
+    .kawaii-mouth {
+      width: 26px;
+      height: 18px;
+      border-radius: 0 0 26px 26px;
+      border-bottom: 3px solid #2b1023;
+      margin-top: 2px;
+    }
+
+    .kawaii-blush {
+      position: absolute;
+      bottom: 30px;
+      width: 70%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 12px;
+    }
+
+    .kawaii-blush span {
+      width: 18px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 131, 173, 0.65);
+      filter: blur(1px);
+    }
+
+    .kawaii-text {
+      position: absolute;
+      bottom: 8px;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #702241;
+      opacity: 0.9;
+    }
+
+    /* Floating decorations (shared) */
+    .floating-decor {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .floater {
+      position: absolute;
+      font-size: 20px;
+      opacity: 0.75;
+      animation: floatAround var(--duration, 18s) linear infinite;
+      filter: drop-shadow(0 0 10px rgba(255, 143, 189, 0.65));
+    }
+
+    /* PAGE 2: winter night */
+    #page2 {
+      background: var(--bg-night);
+      color: #fef9ff;
+    }
+
+    #page2 .center-card {
+      background: radial-gradient(circle at top, rgba(40, 62, 112, 0.85), rgba(5, 0, 15, 0.96));
+      border-color: rgba(160, 189, 255, 0.55);
+      box-shadow: 0 18px 40px rgba(10, 20, 50, 0.9);
+      color: #eef3ff;
+    }
+
+    .snow-ground {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -40px;
+      height: 160px;
+      background: radial-gradient(circle at top, #ffffff, #e6f2ff);
+      border-radius: 50% 50% 0 0;
+      box-shadow:
+        0 -8px 20px rgba(10, 10, 30, 0.7),
+        0 -2px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .sky-fireworks {
+      position: absolute;
+      inset: 0;
+      overflow: visible;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .firework-dot {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff, rgba(255, 255, 255, 0));
+      box-shadow: 0 0 10px currentColor;
+      opacity: 0;
+    }
+
+    .hb-text {
+      font-size: clamp(1.8rem, 6vw, 2.6rem);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      background: linear-gradient(90deg, #ffffff, #fdd3ff, #9bd3ff, #ffffff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 22px rgba(255, 255, 255, 0.7);
+      opacity: 0;
+    }
+
+    .hb-dots-layer {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .hb-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 9px rgba(255, 255, 255, 0.9);
+      position: absolute;
+      opacity: 0;
+    }
+
+    /* PAGE 3: cake + candles */
+    #page3 {
+      background: radial-gradient(circle at top, #222332, #050006, #000);
+      color: #ffeefc;
+    }
+
+    #page3 .center-card {
+      background: radial-gradient(circle at top, rgba(25, 25, 35, 0.96), rgba(0, 0, 0, 0.98));
+      border-color: rgba(255, 111, 174, 0.7);
+      color: #ffeefa;
+      box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.9),
+        0 0 24px rgba(255, 111, 174, 0.7);
+    }
+
+    .cake-wrapper {
+      margin-top: 12px;
+    }
+
+    .cake-scene {
+      position: relative;
+      width: 220px;
+      height: 180px;
+      margin: 0 auto;
+    }
+
+    .cake-plate {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 210px;
+      height: 28px;
+      background: radial-gradient(circle at top, #ffffff, #d0c5ff);
+      border-radius: 50%;
+      box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.8),
+        0 -1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .cake-body {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 180px;
+      height: 80px;
+      border-radius: 24px 24px 18px 18px;
+      background: linear-gradient(180deg, #ffe9f6, #ffb4db, #ff8fbd);
+      box-shadow:
+        0 10px 22px rgba(0, 0, 0, 0.7),
+        0 0 0 2px rgba(255, 255, 255, 0.7);
+      overflow: hidden;
+    }
+
+    .cake-layer {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.4),
+        rgba(255, 255, 255, 0.4) 12px,
+        rgba(255, 255, 255, 0) 12px,
+        rgba(255, 255, 255, 0) 24px
+      );
+      opacity: 0.6;
+    }
+
+    .cake-icing-drip {
+      position: absolute;
+      top: -18px;
+      left: -4px;
+      right: -4px;
+      height: 40px;
+      background:
+        radial-gradient(circle at 10% 0, #ffffff, #ffe0f5),
+        radial-gradient(circle at 80% 0, #ffffff, #ffe0f5);
+      border-radius: 999px;
+      box-shadow: 0 6px 12px rgba(255, 255, 255, 0.5);
+    }
+
+    .cake-icing-drip::before,
+    .cake-icing-drip::after {
+      content: "";
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: #ffffff;
+      top: 14px;
+      box-shadow:
+        52px 8px 0 #ffffff,
+        104px 0 0 #ffffff;
+    }
+
+    .cake-icing-drip::before {
+      left: 16px;
+    }
+    .cake-icing-drip::after {
+      right: 28px;
+    }
+
+    /* Candles */
+    .candles {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 18px;
+      align-items: flex-end;
+    }
+
+    .candle {
+      width: 14px;
+      height: 46px;
+      border-radius: 999px;
+      background: repeating-linear-gradient(
+        0deg,
+        #ffe8f6,
+        #ffe8f6 8px,
+        #ffb4db 8px,
+        #ffb4db 16px
+      );
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
+      position: relative;
+    }
+
+    .candle::before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 3px;
+      height: 5px;
+      border-radius: 999px;
+      background: #2b1023;
+    }
+
+    .flame {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 22px;
+      background: radial-gradient(circle at 50% 0, #ffffff, #ffd27e, #ff8f2b);
+      border-radius: 50% 50% 48% 48%;
+      box-shadow:
+        0 0 8px rgba(255, 210, 126, 0.9),
+        0 0 18px rgba(255, 215, 140, 0.9);
+      opacity: 0;
+      transform-origin: 50% 100%;
+    }
+
+    .flame.lit {
+      opacity: 1;
+      animation: candleFlicker 0.9s ease-in-out infinite alternate;
+    }
+
+    .cake-text {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      opacity: 0.75;
+      font-style: italic;
+    }
+
+    /* Balloons + confetti (page3) */
+    #balloon-layer,
+    #confetti-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .balloon {
+      position: absolute;
+      width: 34px;
+      height: 44px;
+      border-radius: 50% 50% 48% 48%;
+      background: radial-gradient(circle at 30% 0, #ffffff, var(--color));
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+    }
+
+    .balloon::after {
+      content: "";
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      width: 1px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 6px;
+      height: 14px;
+      border-radius: 2px;
+      background: var(--color);
+      opacity: 0;
+    }
+
+    /* PAGE 4 */
+    #page4 {
+      background: radial-gradient(circle at top, #201426, #05000b, #000);
+      color: #ffeefc;
+    }
+
+    #page4 .center-card {
+      background: radial-gradient(circle at top, rgba(25, 5, 35, 0.96), rgba(2, 0, 10, 0.98));
+      border-color: rgba(255, 143, 189, 0.7);
+      color: #ffeefa;
+      box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.9),
+        0 0 24px rgba(255, 143, 189, 0.7);
+    }
+
+    /* Animations */
+    @keyframes backgroundDrift {
+      0% { background-position: 0 0; }
+      50% { background-position: 100% 100%; }
+      100% { background-position: 0 0; }
+    }
+
+    @keyframes flipCard {
+      0%, 45% {
+        transform: rotateY(0deg);
+      }
+      55%, 100% {
+        transform: rotateY(180deg);
+      }
+    }
+
+    @keyframes floatAround {
+      0% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+      }
+      50% {
+        transform: translate3d(20px, -35px, 0) rotate(10deg);
+      }
+      100% {
+        transform: translate3d(-10px, -75px, 0) rotate(-5deg);
+      }
+    }
+
+    @keyframes candleFlicker {
+      0% {
+        transform: translateX(-50%) scale(1, 1);
+        box-shadow:
+          0 0 8px rgba(255, 210, 126, 0.9),
+          0 0 18px rgba(255, 215, 140, 0.9);
+      }
+      50% {
+        transform: translateX(-50%) scale(0.9, 1.1);
+        box-shadow:
+          0 0 12px rgba(255, 230, 160, 1),
+          0 0 22px rgba(255, 235, 170, 1);
+      }
+      100% {
+        transform: translateX(-50%) scale(1.05, 0.95);
+        box-shadow:
+          0 0 10px rgba(255, 210, 126, 1),
+          0 0 20px rgba(255, 215, 140, 1);
+      }
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 480px) {
+      .center-card {
+        padding: 20px 14px 22px;
+        border-radius: 20px;
+      }
+      .flip-card {
+        width: 190px;
+        height: 120px;
+      }
+      .cake-scene {
+        width: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- PAGE 1 -->
+    <section id="page1" class="page active">
+      <div class="center-card flip-box-wrapper">
+        <h2>Hi there, Sneha</h2>
+        <p class="subtitle">Just a tiny box… hiding a lot of feelings. 💗</p>
+
+        <div class="flip-card">
+          <div class="flip-inner">
+            <div class="flip-face front">
+              <span>I have something for you</span>
+            </div>
+            <div class="flip-face back">
+              <span>It’s very special</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="box-caption">Let this little box flip while your heart warms up. ✨</p>
+
+        <button id="btn-enter-day" class="glow-button">
+          Enter my day
+        </button>
+
+        <div class="kawaii-sticker">
+          <div class="kawaii-face">
+            <div class="kawaii-eyes">
+              <div class="kawaii-eye"></div>
+              <div class="kawaii-eye"></div>
+            </div>
+            <div class="kawaii-mouth"></div>
+            <div class="kawaii-blush">
+              <span></span><span></span>
+            </div>
+            <div class="kawaii-text">for you 💕</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating decor (flowers, stars, balloons) -->
+      <div class="floating-decor" id="floating-layer">
+        <!-- Elements are added via JS for randomness -->
+      </div>
+    </section>
+
+    <!-- PAGE 2 -->
+    <section id="page2" class="page">
+      <div class="center-card">
+        <h3>On a cold winter night…</h3>
+        <p class="subtitle">…the sky lights up just for your birthday. ❄️</p>
+
+        <div class="hb-dots-layer" id="hb-dots-layer"></div>
+
+        <div style="margin-top: 60px; margin-bottom: 28px;">
+          <div id="hb-text" class="hb-text">
+            Happy Birthday Sneha
+          </div>
+        </div>
+
+        <button id="btn-celebrate" class="glow-button">
+          Celebrate Birthday
+        </button>
+
+        <div class="snow-ground"></div>
+      </div>
+
+      <div class="sky-fireworks" id="sky-fireworks"></div>
+    </section>
+
+    <!-- PAGE 3 -->
+    <section id="page3" class="page">
+      <div class="center-card">
+        <h3>Make a little wish…</h3>
+        <p class="subtitle">The cake is ready, the candles are waiting for you. 🎂</p>
+
+        <div class="cake-wrapper">
+          <div id="cake-scene" class="cake-scene">
+            <div class="cake-plate"></div>
+            <div class="cake-body">
+              <div class="cake-icing-drip"></div>
+              <div class="cake-layer"></div>
+            </div>
+            <div class="candles">
+              <div class="candle">
+                <div class="flame lit"></div>
+              </div>
+              <div class="candle">
+                <div class="flame lit"></div>
+              </div>
+              <div class="candle">
+                <div class="flame lit"></div>
+              </div>
+            </div>
+          </div>
+
+          <p class="cake-text">
+            Shake your phone gently to blow out the candles
+            <span style="opacity:0.7;">(or tap the cake if motion isn’t available).</span>
+          </p>
+          <p class="hint">Once they’re out, the party begins. 🎈🎉</p>
+        </div>
+
+        <button id="btn-next-page" class="glow-button" style="margin-top: 26px;">
+          Next page
+        </button>
+      </div>
+
+      <div id="balloon-layer"></div>
+      <div id="confetti-layer"></div>
+    </section>
+
+    <!-- PAGE 4 -->
+    <section id="page4" class="page">
+      <div class="center-card">
+        <h3>Under construction… pending 💌</h3>
+        <p class="subtitle">
+          This page is still under construction… pending sweet memories, inside jokes,
+          and a few more surprises just for you.
+        </p>
+
+        <p style="margin-top: 22px; font-size: 0.93rem; opacity: 0.85;">
+          Consider this a bookmark for all the moments we’ve yet to create.
+          <br /><br />
+          For now, just know: you are cherished more than this tiny page can ever show. 💖
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // -------- Helpers: page transitions --------
+    const pages = {
+      1: document.getElementById('page1'),
+      2: document.getElementById('page2'),
+      3: document.getElementById('page3'),
+      4: document.getElementById('page4')
+    };
+    let currentPage = 1;
+    let page2Started = false;
+    let page3Started = false;
+    let candlesBlownOut = false;
+
+    function showPage(target) {
+      if (target === currentPage) return;
+      const fromPage = pages[currentPage];
+      const toPage = pages[target];
+      gsap.killTweensOf(fromPage);
+      gsap.set(toPage, { autoAlpha: 0, display: 'flex' });
+
+      const tl = gsap.timeline();
+      tl.to(fromPage, {
+        duration: 0.4,
+        autoAlpha: 0,
+        y: 20,
+        ease: "power2.inOut",
+        onComplete: () => {
+          fromPage.classList.remove('active');
+          gsap.set(fromPage, { display: 'none', y: 0 });
+        }
+      }).to(toPage, {
+        duration: 0.5,
+        autoAlpha: 1,
+        y: 0,
+        ease: "power2.out",
+        onStart: () => {
+          toPage.classList.add('active');
+        }
+      }, "-=0.1");
+
+      currentPage = target;
+
+      if (currentPage === 2 && !page2Started) {
+        startPage2Effects();
+        page2Started = true;
+      }
+      if (currentPage === 3 && !page3Started) {
+        startPage3Effects();
+        page3Started = true;
+      }
+    }
+
+    // -------- Floating decor for page 1 --------
+    function createFloatingDecor() {
+      const layer = document.getElementById('floating-layer');
+      const icons = ["🌸", "⭐", "✨", "🎈", "🌷"];
+      const count = 16;
+
+      for (let i = 0; i < count; i++) {
+        const span = document.createElement('span');
+        span.className = 'floater';
+        span.textContent = icons[i % icons.length];
+        const left = Math.random() * 100;
+        const top = Math.random() * 100;
+        const duration = 16 + Math.random() * 14;
+        const delay = -Math.random() * duration;
+        span.style.left = left + '%';
+        span.style.top = top + '%';
+        span.style.setProperty('--duration', duration + 's');
+        span.style.animationDelay = delay + 's';
+        layer.appendChild(span);
+      }
+    }
+
+    // -------- Page 2: fireworks + dots forming text --------
+    function startPage2Effects() {
+      createFireworks();
+      createHBDots();
+      animateHBDotsAndText();
+    }
+
+    function createFireworks() {
+      const container = document.getElementById('sky-fireworks');
+      const colors = ["#ff9ecd", "#9bd3ff", "#fff1a8", "#ff8fbd", "#a3ffde"];
+
+      function launchBurst() {
+        const centerX = Math.random() * window.innerWidth * 0.8 + window.innerWidth * 0.1;
+        const centerY = Math.random() * window.innerHeight * 0.4 + window.innerHeight * 0.1;
+        const count = 18 + Math.floor(Math.random() * 14);
+        const burstDots = [];
+
+        for (let i = 0; i < count; i++) {
+          const dot = document.createElement('div');
+          dot.className = 'firework-dot';
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          dot.style.color = color;
+          dot.style.background = `radial-gradient(circle, #fff, ${color})`;
+          container.appendChild(dot);
+          burstDots.push(dot);
+        }
+
+        gsap.set(burstDots, {
+          x: centerX,
+          y: centerY,
+          scale: 0.2,
+          opacity: 0
+        });
+
+        gsap.to(burstDots, {
+          duration: 0.9,
+          opacity: 1,
+          stagger: { each: 0.01, from: "center" },
+          ease: "power2.out"
+        });
+
+        gsap.to(burstDots, {
+          duration: 1.3,
+          x: (i) => centerX + Math.cos((i / count) * Math.PI * 2) * (70 + Math.random() * 60),
+          y: (i) => centerY + Math.sin((i / count) * Math.PI * 2) * (70 + Math.random() * 60),
+          scale: () => 0.6 + Math.random() * 0.5,
+          ease: "power3.out",
+          onComplete: () => {
+            burstDots.forEach(d => d.remove());
+          }
+        });
+
+        gsap.to(burstDots, {
+          duration: 1.1,
+          opacity: 0,
+          delay: 0.7,
+          ease: "power2.in"
+        });
+      }
+
+      // initial bursts
+      for (let i = 0; i < 3; i++) {
+        setTimeout(launchBurst, 400 * i);
+      }
+      // looped random bursts
+      setInterval(launchBurst, 1500);
+    }
+
+    function createHBDots() {
+      const layer = document.getElementById('hb-dots-layer');
+      const count = 80;
+      const { innerWidth: w, innerHeight: h } = window;
+
+      for (let i = 0; i < count; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'hb-dot';
+        const startX = Math.random() * w;
+        const startY = Math.random() * h;
+        dot.dataset.startX = startX;
+        dot.dataset.startY = startY;
+        gsap.set(dot, {
+          x: startX,
+          y: startY,
+          opacity: 0
+        });
+        layer.appendChild(dot);
+      }
+    }
+
+    function animateHBDotsAndText() {
+      const dots = Array.from(document.querySelectorAll('.hb-dot'));
+      const textEl = document.getElementById('hb-text');
+
+      const rect = textEl.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2 + window.scrollY;
+
+      const radiusX = rect.width * 0.5;
+      const radiusY = rect.height * 1.2;
+
+      dots.forEach((dot, i) => {
+        const angle = (i / dots.length) * Math.PI * 2;
+        const r = Math.random() * 0.7 + 0.3;
+        const targetX = centerX + Math.cos(angle) * radiusX * r;
+        const targetY = centerY + Math.sin(angle) * radiusY * r;
+
+        gsap.to(dot, {
+          delay: 0.3 + Math.random() * 0.6,
+          duration: 1.4,
+          x: targetX,
+          y: targetY,
+          opacity: 1,
+          ease: "power3.out"
+        });
+
+        gsap.to(dot, {
+          delay: 1.7 + Math.random() * 0.7,
+          duration: 0.9,
+          y: targetY - (10 + Math.random() * 10),
+          opacity: 0.4,
+          ease: "power2.inOut"
+        });
+      });
+
+      gsap.to(textEl, {
+        delay: 1.3,
+        duration: 1.3,
+        opacity: 1,
+        y: -4,
+        ease: "power2.out"
+      });
+    }
+
+    // -------- Page 3: motion / candles / balloons / confetti --------
+    function startPage3Effects() {
+      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+        DeviceMotionEvent.requestPermission().catch(() => {});
+      }
+      startShakeListener();
+      gsap.from('#cake-scene', {
+        duration: 0.9,
+        y: 30,
+        autoAlpha: 0,
+        ease: "back.out(1.4)"
+      });
+    }
+
+    function blowOutCandles() {
+      if (candlesBlownOut) return;
+      candlesBlownOut = true;
+
+      const flames = document.querySelectorAll('.flame');
+      gsap.to(flames, {
+        duration: 0.6,
+        scaleY: 0,
+        scaleX: 1.5,
+        y: -10,
+        autoAlpha: 0,
+        ease: "power2.in",
+        onComplete: () => {
+          flames.forEach(f => {
+            f.classList.remove('lit');
+          });
+        }
+      });
+
+      gsap.to('#page3 .center-card', {
+        duration: 0.7,
+        boxShadow: "0 20px 40px rgba(0,0,0,0.9), 0 0 12px rgba(255,111,174,0.4)",
+        ease: "power2.inOut"
+      });
+
+      releaseBalloons();
+      startConfetti();
+    }
+
+    function startShakeListener() {
+      let lastTime = 0;
+      let lastX = 0, lastY = 0, lastZ = 0;
+      const threshold = 16;
+
+      if (window.DeviceMotionEvent) {
+        window.addEventListener('devicemotion', (e) => {
+          const current = Date.now();
+          if (current - lastTime < 180) return;
+
+          const acc = e.accelerationIncludingGravity;
+          if (!acc) return;
+
+          const { x, y, z } = acc;
+          const deltaX = x - lastX;
+          const deltaY = y - lastY;
+          const deltaZ = z - lastZ;
+
+          const speed = Math.abs(deltaX + deltaY + deltaZ);
+
+          if (speed > threshold) {
+            blowOutCandles();
+          }
+
+          lastTime = current;
+          lastX = x;
+          lastY = y;
+          lastZ = z;
+        });
+      }
+
+      const cakeScene = document.getElementById('cake-scene');
+      cakeScene.addEventListener('click', blowOutCandles);
+    }
+
+    function releaseBalloons() {
+      const layer = document.getElementById('balloon-layer');
+      const colors = ["#ff9ecd", "#ff6fae", "#ffcf8f", "#9bd3ff", "#a3ffde"];
+      const count = 16;
+
+      for (let i = 0; i < count; i++) {
+        const b = document.createElement('div');
+        b.className = 'balloon';
+        const color = colors[i % colors.length];
+        b.style.setProperty('--color', color);
+        const startX = Math.random() * window.innerWidth;
+        const drift = -40 + Math.random() * 80;
+
+        layer.appendChild(b);
+
+        gsap.set(b, {
+          x: startX,
+          y: window.innerHeight + 60,
+          scale: 0.8 + Math.random() * 0.4,
+          opacity: 0
+        });
+
+        const delay = 0.2 + i * 0.12;
+
+        gsap.to(b, {
+          delay,
+          duration: 0.4,
+          opacity: 1,
+          ease: "power1.out"
+        });
+
+        gsap.to(b, {
+          delay,
+          duration: 5 + Math.random() * 2,
+          y: -120,
+          x: startX + drift,
+          ease: "sine.inOut",
+          onComplete: () => b.remove()
+        });
+      }
+    }
+
+    function startConfetti() {
+      const layer = document.getElementById('confetti-layer');
+      const colors = ["#ff9ecd", "#ffd18f", "#9bd3ff", "#a3ffde", "#ffffff"];
+      const count = 70;
+
+      for (let i = 0; i < count; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti-piece';
+        c.style.setProperty('--color', colors[i % colors.length]);
+        const startX = Math.random() * window.innerWidth;
+        const rotate = Math.random() * 360;
+        layer.appendChild(c);
+
+        gsap.set(c, {
+          x: startX,
+          y: -40,
+          rotation: rotate,
+          opacity: 0
+        });
+
+        const delay = 0.1 + Math.random() * 0.8;
+
+        gsap.to(c, {
+          delay,
+          duration: 0.25,
+          opacity: 1
+        });
+
+        gsap.to(c, {
+          delay,
+          duration: 3 + Math.random() * 1.5,
+          y: window.innerHeight + 80,
+          rotation: rotate + 360 + Math.random() * 360,
+          x: startX + (-40 + Math.random() * 80),
+          ease: "sine.in",
+          onComplete: () => c.remove()
+        });
+      }
+    }
+
+    // -------- Wire up buttons --------
+    document.getElementById('btn-enter-day').addEventListener('click', () => {
+      showPage(2);
+    });
+
+    document.getElementById('btn-celebrate').addEventListener('click', () => {
+      showPage(3);
+    });
+
+    document.getElementById('btn-next-page').addEventListener('click', () => {
+      showPage(4);
+    });
+
+    // -------- Init on load --------
+    window.addEventListener('load', () => {
+      createFloatingDecor();
+      gsap.from('#page1 .center-card', {
+        duration: 0.7,
+        y: 24,
+        autoAlpha: 0,
+        ease: "power2.out"
+      });
+    });
+
+    // Recompute dots for HB text on resize
+    window.addEventListener('resize', () => {
+      if (page2Started) {
+        const layer = document.getElementById('hb-dots-layer');
+        layer.innerHTML = '';
+        createHBDots();
+        animateHBDotsAndText();
+      }
+    });
+  </script>
+</body>
+</html>

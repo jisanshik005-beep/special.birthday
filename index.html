@@ -864,6 +864,18 @@
       if (target === currentPage) return;
       const fromPage = pages[currentPage];
       const toPage = pages[target];
+      if (!fromPage || !toPage) return;
+
+      // Fallback: if GSAP is not available, just switch pages instantly
+      if (typeof gsap === 'undefined') {
+        fromPage.classList.remove('active');
+        fromPage.style.display = 'none';
+        toPage.style.display = 'flex';
+        toPage.classList.add('active');
+        currentPage = target;
+        return;
+      }
+
       gsap.killTweensOf(fromPage);
       gsap.set(toPage, { autoAlpha: 0, display: 'flex' });
 
@@ -889,11 +901,11 @@
 
       currentPage = target;
 
-      if (currentPage === 2 && !page2Started) {
+      if (currentPage === 2 && !page2Started && typeof gsap !== 'undefined') {
         startPage2Effects();
         page2Started = true;
       }
-      if (currentPage === 3 && !page3Started) {
+      if (currentPage === 3 && !page3Started && typeof gsap !== 'undefined') {
         startPage3Effects();
         page3Started = true;
       }
@@ -1277,12 +1289,14 @@
     // -------- Init on load --------
     window.addEventListener('load', () => {
       createFloatingDecor();
-      gsap.from('#page1 .center-card', {
-        duration: 0.7,
-        y: 24,
-        autoAlpha: 0,
-        ease: "power2.out"
-      });
+      if (typeof gsap !== 'undefined') {
+        gsap.from('#page1 .center-card', {
+          duration: 0.7,
+          y: 24,
+          autoAlpha: 0,
+          ease: "power2.out"
+        });
+      }
     });
 
     // Recompute dots for HB text on resize

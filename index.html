@@ -301,6 +301,31 @@
       color: #eef3ff;
     }
 
+    #page2 .center-card-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-height: 260px;
+    }
+
+    #page2 .glow-button {
+      margin-top: 18px;
+      padding-inline: 26px;
+      font-size: 1.05rem;
+      box-shadow:
+        0 0 0 1px rgba(255, 179, 214, 0.9),
+        0 14px 32px rgba(255, 111, 174, 0.65),
+        0 0 30px rgba(255, 179, 214, 1);
+    }
+
+    .page2-cta-hint {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
     .snow-ground {
       position: absolute;
       left: 0;
@@ -312,6 +337,24 @@
       box-shadow:
         0 -8px 20px rgba(10, 10, 30, 0.7),
         0 -2px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .sky-stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: -2;
+    }
+
+    .sky-star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background: #ffffff;
+      opacity: 0.4;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+      animation: twinkle 3.5s ease-in-out infinite;
     }
 
     .sky-fireworks {
@@ -329,6 +372,16 @@
       border-radius: 50%;
       background: radial-gradient(circle, #fff, rgba(255, 255, 255, 0));
       box-shadow: 0 0 10px currentColor;
+      opacity: 0;
+    }
+
+    .firework-core {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffffff, rgba(255, 255, 255, 0));
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
       opacity: 0;
     }
 
@@ -597,6 +650,11 @@
       100% { background-position: 0 0; }
     }
 
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(0.9); }
+      50% { opacity: 0.9; transform: scale(1.4); }
+    }
+
     @keyframes flipCard {
       0%, 45% {
         transform: rotateY(0deg);
@@ -704,24 +762,28 @@
     <!-- PAGE 2 -->
     <section id="page2" class="page">
       <div class="center-card">
-        <h3>On a cold winter night…</h3>
-        <p class="subtitle">…the sky lights up just for your birthday. ❄️</p>
+        <div class="center-card-inner">
+          <h3>On a cold winter night…</h3>
+          <p class="subtitle">…the sky lights up just for your birthday. ❄️</p>
 
-        <div class="hb-dots-layer" id="hb-dots-layer"></div>
+          <div class="hb-dots-layer" id="hb-dots-layer"></div>
 
-        <div style="margin-top: 60px; margin-bottom: 28px;">
-          <div id="hb-text" class="hb-text">
-            Happy Birthday Sneha
+          <div style="margin-top: 40px; margin-bottom: 10px;">
+            <div id="hb-text" class="hb-text">
+              Happy Birthday Sneha
+            </div>
           </div>
-        </div>
 
-        <button id="btn-celebrate" class="glow-button">
-          Celebrate Birthday
-        </button>
+          <button id="btn-celebrate" class="glow-button">
+            Celebrate Birthday
+          </button>
+          <p class="page2-cta-hint">Tap this glowing button to continue the celebration →</p>
+        </div>
 
         <div class="snow-ground"></div>
       </div>
 
+      <div class="sky-stars" id="sky-stars"></div>
       <div class="sky-fireworks" id="sky-fireworks"></div>
     </section>
 
@@ -861,9 +923,28 @@
 
     // -------- Page 2: fireworks + dots forming text --------
     function startPage2Effects() {
+      createStarfield();
       createFireworks();
       createHBDots();
       animateHBDotsAndText();
+    }
+
+    function createStarfield() {
+      const container = document.getElementById('sky-stars');
+      if (!container) return;
+      container.innerHTML = '';
+      const count = 45;
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('div');
+        s.className = 'sky-star';
+        const left = Math.random() * 100;
+        const top = Math.random() * 60; // keep stars mostly in the sky area
+        const delay = Math.random() * 4;
+        s.style.left = left + '%';
+        s.style.top = top + '%';
+        s.style.animationDelay = `${delay}s`;
+        container.appendChild(s);
+      }
     }
 
     function createFireworks() {
@@ -872,9 +953,37 @@
 
       function launchBurst() {
         const centerX = Math.random() * window.innerWidth * 0.8 + window.innerWidth * 0.1;
-        const centerY = Math.random() * window.innerHeight * 0.4 + window.innerHeight * 0.1;
-        const count = 18 + Math.floor(Math.random() * 14);
+        const centerY = Math.random() * window.innerHeight * 0.35 + window.innerHeight * 0.05;
+        const count = 26 + Math.floor(Math.random() * 18);
         const burstDots = [];
+
+        // core flash
+        const core = document.createElement('div');
+        core.className = 'firework-core';
+        container.appendChild(core);
+
+        gsap.set(core, {
+          x: centerX - 9,
+          y: centerY - 9,
+          scale: 0.2,
+          opacity: 0
+        });
+
+        gsap.to(core, {
+          duration: 0.25,
+          opacity: 1,
+          scale: 1,
+          ease: 'power2.out'
+        });
+
+        gsap.to(core, {
+          duration: 0.5,
+          opacity: 0,
+          scale: 1.4,
+          delay: 0.25,
+          ease: 'power1.in',
+          onComplete: () => core.remove()
+        });
 
         for (let i = 0; i < count; i++) {
           const dot = document.createElement('div');
@@ -889,42 +998,42 @@
         gsap.set(burstDots, {
           x: centerX,
           y: centerY,
-          scale: 0.2,
+          scale: 0.25,
           opacity: 0
         });
 
         gsap.to(burstDots, {
-          duration: 0.9,
+          duration: 0.6,
           opacity: 1,
-          stagger: { each: 0.01, from: "center" },
-          ease: "power2.out"
+          stagger: { each: 0.01, from: 'center' },
+          ease: 'power2.out'
         });
 
         gsap.to(burstDots, {
-          duration: 1.3,
-          x: (i) => centerX + Math.cos((i / count) * Math.PI * 2) * (70 + Math.random() * 60),
-          y: (i) => centerY + Math.sin((i / count) * Math.PI * 2) * (70 + Math.random() * 60),
-          scale: () => 0.6 + Math.random() * 0.5,
-          ease: "power3.out",
+          duration: 1.5,
+          x: (i) => centerX + Math.cos((i / count) * Math.PI * 2) * (80 + Math.random() * 80),
+          y: (i) => centerY + Math.sin((i / count) * Math.PI * 2) * (80 + Math.random() * 80),
+          scale: () => 0.7 + Math.random() * 0.6,
+          ease: 'power3.out',
           onComplete: () => {
             burstDots.forEach(d => d.remove());
           }
         });
 
         gsap.to(burstDots, {
-          duration: 1.1,
+          duration: 1.3,
           opacity: 0,
-          delay: 0.7,
-          ease: "power2.in"
+          delay: 0.8,
+          ease: 'power2.in'
         });
       }
 
       // initial bursts
       for (let i = 0; i < 3; i++) {
-        setTimeout(launchBurst, 400 * i);
+        setTimeout(launchBurst, 450 * i);
       }
       // looped random bursts
-      setInterval(launchBurst, 1500);
+      setInterval(launchBurst, 1700);
     }
 
     function createHBDots() {

@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- GSAP for smooth animations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <!-- Three.js for 3D dot floor + text on Page 2 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r150/three.min.js"></script>
   <style>
     :root {
       --pink: #ff6fae;
@@ -292,6 +294,15 @@
     #page2 {
       background: var(--bg-night);
       color: #fef9ff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .three-root-page2 {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      z-index: 0;
     }
 
     #page2 .center-card {
@@ -766,6 +777,7 @@
 
     <!-- PAGE 2 -->
     <section id="page2" class="page">
+      <div id="three-root-page2" class="three-root-page2"></div>
       <div class="center-card">
         <div class="center-card-inner">
           <h3>On a cold winter night…</h3>
@@ -938,12 +950,218 @@
       }
     }
 
-    // -------- Page 2: fireworks + dots forming text --------
+    // -------- Page 2: 3D dot floor + dot text with Three.js --------
+    let p2Scene, p2Camera, p2Renderer, p2FloorPoints, p2TextPoints;
+    let p2TextGeometry, p2TextPositions, p2TextStartPositions;
+    let p2Clock = typeof THREE !== 'undefined' ? new THREE.Clock() : null;
+    let p2ThreeInitialized = false;
+
     function startPage2Effects() {
-      createStarfield();
-      createFireworks();
-      createHBDots();
-      animateHBDotsAndText();
+      // If Three.js isn't available, fall back to the original 2D effects
+      if (typeof THREE === 'undefined') {
+        createStarfield();
+        createFireworks();
+        createHBDots();
+        animateHBDotsAndText();
+        return;
+      }
+      initPage2Three();
+    }
+
+    function initPage2Three() {
+      if (p2ThreeInitialized || typeof THREE === 'undefined') return;
+      const root = document.getElementById('three-root-page2');
+      if (!root) return;
+
+      p2Renderer = new THREE.WebGLRenderer({ antialias: true });
+      p2Renderer.setPixelRatio(window.devicePixelRatio || 1);
+      p2Renderer.setSize(window.innerWidth, window.innerHeight);
+      p2Renderer.setClearColor(0x000000, 1);
+      root.innerHTML = '';
+      root.appendChild(p2Renderer.domElement);
+
+      p2Scene = new THREE.Scene();
+
+      const aspect = window.innerWidth / window.innerHeight;
+      p2Camera = new THREE.PerspectiveCamera(55, aspect, 0.1, 1000);
+      p2Camera.position.set(0, 30, 90);
+      p2Camera.lookAt(0, 18, -20);
+
+      const ambient = new THREE.AmbientLight(0xffffff, 1.0);
+      p2Scene.add(ambient);
+
+      createPage2FloorDots();
+      createPage2TextDots('HAPPY BIRTHDAY');
+
+      window.addEventListener('resize', onPage2Resize);
+
+      p2ThreeInitialized = true;
+      animatePage2Three();
+    }
+
+    function createPage2FloorDots() {
+      const floorGeom = new THREE.BufferGeometry();
+      const positions = [];
+      const sizeX = 90;
+      const depth = 200;
+      const step = 3;
+
+      for (let x = -sizeX; x <= sizeX; x += step) {
+        for (let z = 0; z <= depth; z += step) {
+          positions.push(x, 0, -z);
+        }
+      }
+
+      floorGeom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+
+      const floorMat = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.9,
+        sizeAttenuation: true,
+        transparent: true,
+        opacity: 0.85
+      });
+
+      p2FloorPoints = new THREE.Points(floorGeom, floorMat);
+      p2FloorPoints.position.y = -18;
+      p2Scene.add(p2FloorPoints);
+    }
+
+    function createPage2TextDots(text) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const baseWidth = 800;
+      const baseHeight = 200;
+      canvas.width = baseWidth;
+      canvas.height = baseHeight;
+
+      ctx.clearRect(0, 0, baseWidth, baseHeight);
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = 'bold 120px "Segoe UI", system-ui, sans-serif';
+      ctx.fillText(text, baseWidth / 2, baseHeight / 2);
+
+      const imageData = ctx.getImageData(0, 0, baseWidth, baseHeight).data;
+      const points = [];
+      const step = 6;
+      for (let y = 0; y < baseHeight; y += step) {
+        for (let x = 0; x < baseWidth; x += step) {
+          const idx = (y * baseWidth + x) * 4 + 3;
+          const alpha = imageData[idx];
+          if (alpha > 128) {
+            points.push({ x, y });
+          }
+        }
+      }
+
+      const geom = new THREE.BufferGeometry();
+      const positions = [];
+      const startPositions = [];
+      const scale = 0.18;
+
+      for (const p of points) {
+        const tx = (p.x - baseWidth / 2) * scale;
+        const ty = (baseHeight / 2 - p.y) * scale + 18;
+        const tz = -60;
+
+        positions.push(tx, ty, tz);
+
+        const sx = (Math.random() - 0.5) * 180;
+        const sy = 5 + Math.random() * 70;
+        const sz = -20 - Math.random() * 140;
+        startPositions.push(sx, sy, sz);
+      }
+
+      const positionAttr = new THREE.Float32BufferAttribute(startPositions, 3);
+      geom.setAttribute('position', positionAttr);
+
+      const mat = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 2.5,
+        sizeAttenuation: true,
+        transparent: true,
+        opacity: 0.95
+      });
+
+      p2TextGeometry = geom;
+      p2TextPositions = new Float32Array(positions);
+      p2TextStartPositions = new Float32Array(startPositions);
+
+      p2TextPoints = new THREE.Points(geom, mat);
+      p2Scene.add(p2TextPoints);
+    }
+
+    function animatePage2Three() {
+      if (!p2ThreeInitialized || !p2Renderer || !p2Scene || !p2Camera) return;
+      requestAnimationFrame(animatePage2Three);
+      const t = p2Clock ? p2Clock.getElapsedTime() : performance.now() / 1000;
+
+      // camera bob
+      p2Camera.position.x = Math.sin(t * 0.25) * 10;
+      p2Camera.lookAt(0, 18, -60);
+
+      // floor shimmer
+      if (p2FloorPoints) {
+        const pos = p2FloorPoints.geometry.attributes.position;
+        const arr = pos.array;
+        for (let i = 0; i < arr.length; i += 3) {
+          const x = arr[i];
+          const z = arr[i + 2];
+          const offset = Math.sin(t * 2 + (x + z) * 0.05) * 0.05;
+          arr[i + 1] = offset;
+        }
+        pos.needsUpdate = true;
+      }
+
+      // text particles
+      if (p2TextGeometry && p2TextPositions && p2TextStartPositions) {
+        const pos = p2TextGeometry.attributes.position;
+        const arr = pos.array;
+        const assembleTime = 3.0;
+        const delay = 0.5;
+        const rawProgress = Math.max(0, t - delay) / assembleTime;
+        const progress = rawProgress > 1 ? 1 : rawProgress;
+
+        for (let i = 0; i < arr.length; i += 3) {
+          const sx = p2TextStartPositions[i];
+          const sy = p2TextStartPositions[i + 1];
+          const sz = p2TextStartPositions[i + 2];
+
+          const tx = p2TextPositions[i];
+          const ty = p2TextPositions[i + 1];
+          const tz = p2TextPositions[i + 2];
+
+          const e = easeOutCubic(progress);
+          arr[i]   = sx + (tx - sx) * e;
+          arr[i+1] = sy + (ty - sy) * e;
+          arr[i+2] = sz + (tz - sz) * e;
+        }
+        pos.needsUpdate = true;
+
+        if (progress >= 1) {
+          for (let i = 0; i < arr.length; i += 3) {
+            const baseY = p2TextPositions[i + 1];
+            arr[i + 1] = baseY + Math.sin(t * 2 + i * 0.02) * 0.4;
+          }
+          pos.needsUpdate = true;
+        }
+      }
+
+      p2Renderer.render(p2Scene, p2Camera);
+    }
+
+    function easeOutCubic(x) {
+      return 1 - Math.pow(1 - x, 3);
+    }
+
+    function onPage2Resize() {
+      if (!p2Renderer || !p2Camera) return;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      p2Camera.aspect = w / h;
+      p2Camera.updateProjectionMatrix();
+      p2Renderer.setSize(w, h);
     }
 
     function createStarfield() {

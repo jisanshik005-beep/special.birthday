@@ -413,11 +413,11 @@
     }
 
     .hb-dot {
-      width: 3px;
-      height: 3px;
+      width: 4px;
+      height: 4px;
       border-radius: 50%;
       background: #ffffff;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 1);
+      box-shadow: 0 0 14px rgba(255, 255, 255, 1);
       position: absolute;
       opacity: 0;
     }
@@ -1077,14 +1077,14 @@
 
       const imageData = ctx.getImageData(0, 0, baseWidth, baseHeight).data;
       const points = [];
-      const step = 3; // pixel sampling step; smaller = more dots
+      const step = 2; // pixel sampling step; smaller = more dots
 
       for (let y = 0; y < baseHeight; y += step) {
         for (let x = 0; x < baseWidth; x += step) {
           const idx = (y * baseWidth + x) * 4 + 3; // alpha channel
           const alpha = imageData[idx];
           // slight randomness to avoid perfectly rigid grid, but keep a LOT of points
-          if (alpha > 128 && Math.random() > 0.3) {
+          if (alpha > 128 && Math.random() > 0.15) {
             points.push({ x, y });
           }
         }
@@ -1141,6 +1141,9 @@
       const textEl = document.getElementById('hb-text');
       if (!dots.length || !textEl || typeof gsap === 'undefined') return;
 
+      // hide the normal text visually; we want ONLY dots to draw the letters
+      textEl.style.opacity = 0;
+
       dots.forEach((dot) => {
         const targetX = parseFloat(dot.dataset.tx);
         const targetY = parseFloat(dot.dataset.ty);
@@ -1179,14 +1182,6 @@
           yoyo: true,
           ease: 'sine.inOut'
         });
-      });
-
-      gsap.to(textEl, {
-        delay: 2.2,
-        duration: 1.5,
-        opacity: 1,
-        y: -4,
-        ease: 'power2.out'
       });
     }
 

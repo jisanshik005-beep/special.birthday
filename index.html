@@ -417,7 +417,7 @@
       height: 3px;
       border-radius: 50%;
       background: #ffffff;
-      box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 1);
       position: absolute;
       opacity: 0;
     }
@@ -1077,13 +1077,14 @@
 
       const imageData = ctx.getImageData(0, 0, baseWidth, baseHeight).data;
       const points = [];
-      const step = 4; // pixel sampling step; smaller = more dots
+      const step = 3; // pixel sampling step; smaller = more dots
 
       for (let y = 0; y < baseHeight; y += step) {
         for (let x = 0; x < baseWidth; x += step) {
           const idx = (y * baseWidth + x) * 4 + 3; // alpha channel
           const alpha = imageData[idx];
-          if (alpha > 128 && Math.random() > 0.45) {
+          // slight randomness to avoid perfectly rigid grid, but keep a LOT of points
+          if (alpha > 128 && Math.random() > 0.3) {
             points.push({ x, y });
           }
         }
@@ -1102,13 +1103,19 @@
 
         // starting position: random from bottom of screen
         const startX = Math.random() * viewportWidth;
-        const startY = viewportHeight + Math.random() * 200;
+        const startY = viewportHeight + Math.random() * 260;
+
+        // wandering mid position somewhere in the sky
+        const wanderX = Math.random() * viewportWidth;
+        const wanderY = Math.random() * viewportHeight * 0.7;
 
         const targetX = offsetX + p.x;
         const targetY = offsetY + p.y;
 
         dot.dataset.tx = targetX;
         dot.dataset.ty = targetY;
+        dot.dataset.wx = wanderX;
+        dot.dataset.wy = wanderY;
 
         gsap.set(dot, {
           x: startX,
@@ -1128,22 +1135,37 @@
       dots.forEach((dot) => {
         const targetX = parseFloat(dot.dataset.tx);
         const targetY = parseFloat(dot.dataset.ty);
-        const delay = 0.3 + Math.random() * 0.7;
+        const wanderX = parseFloat(dot.dataset.wx);
+        const wanderY = parseFloat(dot.dataset.wy);
 
+        const delay = Math.random() * 0.8;
+        const wanderDuration = 1.1 + Math.random() * 0.8;
+        const assembleDuration = 1.4 + Math.random() * 0.6;
+
+        // Phase 1: lots of glowing dots running up into random sky positions
         gsap.to(dot, {
           delay,
-          duration: 1.6,
+          duration: wanderDuration,
+          x: wanderX,
+          y: wanderY,
+          opacity: 1,
+          ease: 'power2.out'
+        });
+
+        // Phase 2: then they all get pulled into the exact text shape
+        gsap.to(dot, {
+          delay: delay + wanderDuration,
+          duration: assembleDuration,
           x: targetX,
           y: targetY,
-          opacity: 1,
           ease: 'power3.out'
         });
 
-        // subtle shimmer once in place
+        // Phase 3: subtle shimmer once in place so the text feels alive
         gsap.to(dot, {
-          delay: delay + 1.6,
-          duration: 1.4,
-          y: targetY - (4 + Math.random() * 4),
+          delay: delay + wanderDuration + assembleDuration,
+          duration: 1.6,
+          y: targetY - (3 + Math.random() * 5),
           repeat: -1,
           yoyo: true,
           ease: 'sine.inOut'
@@ -1151,7 +1173,7 @@
       });
 
       gsap.to(textEl, {
-        delay: 1.8,
+        delay: 2.2,
         duration: 1.5,
         opacity: 1,
         y: -4,

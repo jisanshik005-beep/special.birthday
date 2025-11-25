@@ -1090,12 +1090,21 @@
         }
       }
 
-      // Center the sampled points roughly where the text element sits
+      // Map sampled points into the real on-screen text area
+      const rect = textEl.getBoundingClientRect();
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      const offsetX = (viewportWidth - baseWidth) / 2;
-      const centerY = viewportHeight * 0.45;
-      const offsetY = centerY - baseHeight / 2;
+
+      // Fallback if rect has weird size
+      const scaleX = rect.width > 0 ? rect.width / baseWidth : viewportWidth / baseWidth;
+      const scaleY = rect.height > 0 ? rect.height / baseHeight : scaleX;
+      const scale = Math.min(scaleX, scaleY);
+
+      const targetTextWidth = baseWidth * scale;
+      const targetTextHeight = baseHeight * scale;
+
+      const offsetX = rect.left + (rect.width - targetTextWidth) / 2;
+      const offsetY = rect.top + window.scrollY + (rect.height - targetTextHeight) / 2;
 
       points.forEach((p) => {
         const dot = document.createElement('div');
